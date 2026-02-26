@@ -1,4 +1,6 @@
-﻿namespace DS_SEM_1;
+﻿using DS_SEM_1.MonteCarlo;
+
+namespace DS_SEM_1;
 
 public class Program
 {
