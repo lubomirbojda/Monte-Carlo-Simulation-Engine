@@ -8,6 +8,6 @@ public class DiscreteUniform : BaseUniform<int>
 
     public override int GenerateNext()
     {
-        return _generator.Next(_range) + _min;
+        return _generator.Next(_range + 1) + _min;
     }
 }

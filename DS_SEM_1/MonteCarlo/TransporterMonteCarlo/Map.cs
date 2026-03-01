@@ -14,8 +14,8 @@ public class Map
 
     private ContinuousUniform _kSlowdownGenerator;
 
-    private TimeSpan elapsedTime = new(0, 0, 0);
-    private TimeSpan limitK = new(0, 25, 0);
+    public TimeSpan _elapsedTime { get; private set; } = new(0, 0, 0);
+    private TimeSpan _limitK = new(0, 25, 0);
 
     public Map(Random seedGenerator)
     {
@@ -40,10 +40,12 @@ public class Map
         _kSlowdownGenerator = new(seedGenerator, 10, 25);
     }
 
+    public void ResetElapsedTime() => _elapsedTime = new(0, 0, 0);
+
     private double CalculateTime<T>(int length, T generatedSpeed, bool leavingFromK) where T : INumber<T>
     {
         double speed = double.CreateChecked(generatedSpeed);
-        if (leavingFromK && elapsedTime > limitK)
+        if (leavingFromK && _elapsedTime > _limitK)
             speed *= GenerateSlowdown();
 
         return length / speed;
@@ -70,13 +72,13 @@ public class Map
         var redPathTime = GenerateTimeForRedPath(4, false);
 
         var time = Math.Min(blackPathTime, Math.Min(redPathTime, greenPathTime));
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
 
         if (time == blackPathTime)
         {
             var nextRedTime = GenerateTimeForRedPath(2, true);
             time += nextRedTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
         }
 
         return time;
@@ -89,25 +91,25 @@ public class Map
         var redPathTime = GenerateTimeForRedPath(3, false);
 
         var time = Math.Min(blackPathTime, Math.Min(redPathTime, greenPathTime));
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
 
         if (time == blackPathTime)
         {
             var bluePathTime = GenerateTimeForBluePath(4, true);
             time += bluePathTime;
-            elapsedTime.Add(TimeSpan.FromHours(bluePathTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(bluePathTime));
         }
         else if (time == redPathTime)
         {
             var nextRedTime = GenerateTimeForRedPath(4, false);
             time += nextRedTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
         }
         else
         {
             var nextBlackTime = GenerateTimeForBlackPath(3, false);
             time += nextBlackTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
         }
 
         return time;
@@ -117,10 +119,10 @@ public class Map
     {
         var blackPathTime = GenerateTimeForBlackPath(2, false);
         var time = blackPathTime;
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
         var greenPathTime = GenerateTimeForGreenPath(2, true);
         time += greenPathTime;
-        elapsedTime.Add(TimeSpan.FromHours(greenPathTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(greenPathTime));
 
         return time;
     }
@@ -132,13 +134,13 @@ public class Map
         var redPathTime2 = GenerateTimeForRedPath(4, false);
 
         var time = Math.Min(redPathTime1, Math.Min(redPathTime2, greenPathTime));
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
 
         if (time == redPathTime2)
         {
             var nextBlackTime = GenerateTimeForBlackPath(2, true);
             time += nextBlackTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
         }
 
         return time;
@@ -150,12 +152,12 @@ public class Map
         var redPathTime1 = GenerateTimeForRedPath(2, false);
 
         var time = Math.Min(blackPathTime, redPathTime1);
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
         if (time == redPathTime1)
         {
             var greenPathTime = GenerateTimeForGreenPath(2, true);
             time += greenPathTime;
-            elapsedTime.Add(TimeSpan.FromHours(greenPathTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(greenPathTime));
             return time;
         }
 
@@ -164,17 +166,17 @@ public class Map
 
         var minTime = Math.Min(redPathTime2, bluePathTime);
         time += minTime;
-        elapsedTime.Add(TimeSpan.FromHours(minTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
         if (minTime == bluePathTime)
         {
             var redPathTime3 = GenerateTimeForRedPath(2, false);
             time += redPathTime3;
-            elapsedTime.Add(TimeSpan.FromHours(redPathTime3));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(redPathTime3));
         }
 
         var bluePathTime2 = GenerateTimeForBluePath(1, false);
         time += bluePathTime2;
-        elapsedTime.Add(TimeSpan.FromHours(bluePathTime2));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(bluePathTime2));
 
         return time;
     }
@@ -183,10 +185,10 @@ public class Map
     {
         var redPathTime = GenerateTimeForRedPath(2, false);
         var time = redPathTime;
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
         var bluePathTime = GenerateTimeForBluePath(4, true);
         time += bluePathTime;
-        elapsedTime.Add(TimeSpan.FromHours(bluePathTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(bluePathTime));
 
         return time;
     }
@@ -198,25 +200,25 @@ public class Map
         var redPathTime = GenerateTimeForRedPath(4, false);
 
         var time = Math.Min(blackPathTime, Math.Min(redPathTime, bluePathTime));
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
 
         if (time == blackPathTime)
         {
             var nextGreenTime = GenerateTimeForGreenPath(4, false);
             time += nextGreenTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextGreenTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextGreenTime));
         }
         else if (time == redPathTime)
         {
             var nextRedTime = GenerateTimeForRedPath(3, false);
             time += nextRedTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
         }
         else
         {
             var nextBlackTime = GenerateTimeForBlackPath(2, true);
             time += nextBlackTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
         }
 
         return time;
@@ -226,10 +228,10 @@ public class Map
     {
         var bluePathTime = GenerateTimeForBluePath(4, false);
         var time = bluePathTime;
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
         var redPathTime = GenerateTimeForRedPath(2, true);
         time += redPathTime;
-        elapsedTime.Add(TimeSpan.FromHours(redPathTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(redPathTime));
 
         return time;
     }
@@ -241,19 +243,19 @@ public class Map
         var blackPathTime = GenerateTimeForBlackPath(4, false);
 
         var time = Math.Min(bluePathTime1, Math.Min(bluePathTime2, blackPathTime));
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
 
         if (time == bluePathTime1)
         {
             var nextGreenTime = GenerateTimeForGreenPath(2, true);
             time += nextGreenTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextGreenTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextGreenTime));
         }
         else
         { 
             var nextBlueTime = GenerateTimeForBluePath(8, true);
             time += nextBlueTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
         }
 
         return time;
@@ -264,13 +266,13 @@ public class Map
         var greenPathTime = GenerateTimeForGreenPath(2, false);
         var bluePathTime = GenerateTimeForBluePath(1, false);
         var time = Math.Min(greenPathTime, bluePathTime);
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
 
         if (time == greenPathTime)
         {
             var nextRedTime = GenerateTimeForRedPath(2, true);
             time += nextRedTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
             return time;
         }
 
@@ -278,17 +280,17 @@ public class Map
         var redPathTime2 = GenerateTimeForRedPath(3, false);
         var minTime = Math.Min(redPathTime1, redPathTime2);
         time += minTime;
-        elapsedTime.Add(TimeSpan.FromHours(minTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
         if (minTime == redPathTime1)
         {
             var nextBlueTime = GenerateTimeForBluePath(1, false);
             time += nextBlueTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
         }
 
         var nextBlackTime = GenerateTimeForBlackPath(1, false);
         time += nextBlackTime;
-        elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
 
         return time;
     }
@@ -299,13 +301,13 @@ public class Map
         var bluePathTime = GenerateTimeForBluePath(8, false);
 
         var time = Math.Min(greenPathTime, bluePathTime);
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
 
         if (time == greenPathTime)
         {
             var nextBlueTime = GenerateTimeForBluePath(4, true);
             time += nextBlueTime;
-            elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
+            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
             return time;
         }
 
@@ -313,7 +315,7 @@ public class Map
         var nextBlackTime = GenerateTimeForBlackPath(5, true);
         var minTime = Math.Min(nextBlueTime1, nextBlackTime);
         time += minTime;
-        elapsedTime.Add(TimeSpan.FromHours(minTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
 
         return time;
     }
@@ -322,10 +324,10 @@ public class Map
     {
         var greenPathTime = GenerateTimeForGreenPath(2, false);
         var time = greenPathTime;
-        elapsedTime.Add(TimeSpan.FromHours(time));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
         var blackPathTime = GenerateTimeForBlackPath(2, true);
         time += blackPathTime;
-        elapsedTime.Add(TimeSpan.FromHours(blackPathTime));
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(blackPathTime));
 
         return time;
     }
