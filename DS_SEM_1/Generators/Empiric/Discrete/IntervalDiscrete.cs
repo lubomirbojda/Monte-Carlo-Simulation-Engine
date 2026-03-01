@@ -1,5 +1,3 @@
-﻿using System.Reflection.Emit;
-
 namespace DS_SEM_1.Generators.Empiric.Discrete;
 
 public class IntervalDiscrete(int min, int max, double probability, double upperBound, int seedForGenerator) 

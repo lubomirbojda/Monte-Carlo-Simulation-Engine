@@ -1,10 +1,9 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 namespace DS_SEM_1.Generators.Empiric;
 
 public abstract class BaseEmpiric<T, TInterval> where TInterval : BaseInterval<T> where T : INumber<T>
 {
-    private Random _seedGenerator;
     private List<TInterval> _allIntervals;
     private Random _probGenerator;
 
@@ -13,15 +12,14 @@ public abstract class BaseEmpiric<T, TInterval> where TInterval : BaseInterval<T
 
     protected BaseEmpiric(Random seedGenerator, List<(T min, T max, double probabiltiy)> intervals)
     {
-        _seedGenerator = seedGenerator;
-        _probGenerator = new(_seedGenerator.Next());
+        _probGenerator = new(seedGenerator.Next());
         _allIntervals = [];
         double upperBound = 0;
 
         foreach (var (min, max, probability) in intervals)
         {
             upperBound += probability;
-            _allIntervals.Add(CreateInterval(min, max, probability, upperBound, _seedGenerator.Next()));
+            _allIntervals.Add(CreateInterval(min, max, probability, upperBound, seedGenerator.Next()));
         }
 
         if (Math.Abs(upperBound - 1.0) > 0.00001)

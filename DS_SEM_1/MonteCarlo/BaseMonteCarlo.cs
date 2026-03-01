@@ -1,9 +1,10 @@
-﻿namespace DS_SEM_1.MonteCarlo;
+namespace DS_SEM_1.MonteCarlo;
 
 public abstract class BaseMonteCarlo
 {
     protected Random _seedGenerator;
     private bool _isRunning = true;
+    protected int _currentReplication;
 
     protected BaseMonteCarlo()
     {
@@ -20,24 +21,24 @@ public abstract class BaseMonteCarlo
         _isRunning = false;
     }
 
-    protected abstract void DoReplication();
     protected abstract void BeforeSimulation();
-    protected abstract void AfterSimulation();
     protected abstract void BeforeReplication();
+    protected abstract void DoReplication();
     protected abstract void AfterReplication();
+    protected abstract void AfterSimulation();
 
     public void RunSimulation(int replicationsCount)
     {
         BeforeSimulation();
 
-        int currentReplication = 0;
-        while (currentReplication < replicationsCount && _isRunning)
+        _currentReplication = 0;
+        while (_currentReplication < replicationsCount && _isRunning)
         {
             BeforeReplication();
 
             DoReplication();
 
-            currentReplication++;
+            _currentReplication++;
             AfterReplication();
         }
 
