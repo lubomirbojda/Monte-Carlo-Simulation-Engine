@@ -2,19 +2,17 @@ namespace DS_SEM_1.MonteCarlo.TransporterMonteCarlo;
 
 public class TransporterMC : BaseMonteCarlo
 {
-    private Map _map;
+    public Map Map {  get; private set; }
     private double _totalTime;
-    private List<Func<double>> _route;
+    private List<Func<double>> _route = [];
 
-    public TransporterMC(Map map, List<Func<double>> route) : base()
+    public TransporterMC(int seed) : base(seed)
     {
-        _map = map;
-        _route = route;
+        Map = new(_seedGenerator);
     }
 
-    public TransporterMC(int customSeed, Map map, List<Func<double>> route) : base(customSeed)
+    public void SetNewRoute(List<Func<double>> route)
     {
-        _map = map;
         _route = route;
     }
 
@@ -25,7 +23,7 @@ public class TransporterMC : BaseMonteCarlo
 
     protected override void BeforeReplication()
     {
-        _map.ResetElapsedTime();
+        Map.ResetElapsedTime();
     }
 
     protected override void DoReplication()
@@ -34,7 +32,7 @@ public class TransporterMC : BaseMonteCarlo
         {
             move();
         }
-        _totalTime += _map._elapsedTime.TotalMinutes;
+        _totalTime += Map._elapsedTime.TotalMinutes;
     }
 
     protected override void AfterReplication()

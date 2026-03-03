@@ -2,18 +2,13 @@ namespace DS_SEM_1.MonteCarlo;
 
 public abstract class BaseMonteCarlo
 {
-    protected Random _seedGenerator;
+    public Random _seedGenerator {  get; private set; }
     private bool _isRunning = true;
     protected int _currentReplication;
 
-    protected BaseMonteCarlo()
+    protected BaseMonteCarlo(int seed)
     {
-        _seedGenerator = new();
-    }
-
-    protected BaseMonteCarlo(int customSeed)
-    {
-        _seedGenerator = new(customSeed);
+        _seedGenerator = new(seed);
     }
 
     public void StopSimulation()
