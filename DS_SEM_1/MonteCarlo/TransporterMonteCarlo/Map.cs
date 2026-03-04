@@ -65,270 +65,108 @@ public class Map
         return (double)(100 - slowdown) / 100.0;
     }
 
+    private double GetBestOption(params double[] options)
+    {
+        var minTime = options.Min();
+        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
+        return minTime;
+    }
+
     public double ZilinaToDivinka()
     {
-        var blackPathTime = GenerateTimeForBlackPath(2, false);
-        var greenPathTime = GenerateTimeForGreenPath(4, false);
-        var redPathTime = GenerateTimeForRedPath(4, false);
+        var option1 = GenerateTimeForGreenPath(4, false);
+        var option2 = GenerateTimeForRedPath(4, false);
+        var option3 = GenerateTimeForBlackPath(2, false) + GenerateTimeForRedPath(2, true);
 
-        var time = Math.Min(blackPathTime, Math.Min(redPathTime, greenPathTime));
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-
-        if (time == blackPathTime)
-        {
-            var nextRedTime = GenerateTimeForRedPath(2, true);
-            time += nextRedTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
-        }
-
-        return time;
+        return GetBestOption(option1, option2, option3);
     }
 
     public double ZilinaToStrecno()
     {
-        var blackPathTime = GenerateTimeForBlackPath(2, false);
-        var greenPathTime = GenerateTimeForGreenPath(4, false);
-        var redPathTime = GenerateTimeForRedPath(3, false);
+        var option1 = GenerateTimeForRedPath(3, false) + GenerateTimeForRedPath(4, false);
+        var option2 = GenerateTimeForGreenPath(4, false) + GenerateTimeForBlackPath(3, false);
+        var option3 = GenerateTimeForBlackPath(2, false) + GenerateTimeForBluePath(4, true);
 
-        var time = Math.Min(blackPathTime, Math.Min(redPathTime, greenPathTime));
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-
-        if (time == blackPathTime)
-        {
-            var bluePathTime = GenerateTimeForBluePath(4, true);
-            time += bluePathTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(bluePathTime));
-        }
-        else if (time == redPathTime)
-        {
-            var nextRedTime = GenerateTimeForRedPath(4, false);
-            time += nextRedTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
-        }
-        else
-        {
-            var nextBlackTime = GenerateTimeForBlackPath(3, false);
-            time += nextBlackTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
-        }
-
-        return time;
+        return GetBestOption(option1, option2, option3);
     }
 
     public double ZilinaToRajeckeTeplice()
     {
-        var blackPathTime = GenerateTimeForBlackPath(2, false);
-        var time = blackPathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-        var greenPathTime = GenerateTimeForGreenPath(2, true);
-        time += greenPathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(greenPathTime));
-
-        return time;
+        var option1 = GenerateTimeForBlackPath(2, false) + GenerateTimeForGreenPath(2, true);
+        return GetBestOption(option1);
     }
 
     public double DivinkaToZilina()
     {
-        var redPathTime1 = GenerateTimeForRedPath(2, false);
-        var greenPathTime = GenerateTimeForGreenPath(4, false);
-        var redPathTime2 = GenerateTimeForRedPath(4, false);
+        var option1 = GenerateTimeForGreenPath(4, false);
+        var option2 = GenerateTimeForRedPath(4, false);
+        var option3 = GenerateTimeForRedPath(2, false) + GenerateTimeForBlackPath(2, true);
 
-        var time = Math.Min(redPathTime1, Math.Min(redPathTime2, greenPathTime));
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-
-        if (time == redPathTime2)
-        {
-            var nextBlackTime = GenerateTimeForBlackPath(2, true);
-            time += nextBlackTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
-        }
-
-        return time;
+        return GetBestOption(option1, option2, option3);
     }
 
     public double DivinkaToRajeckeTeplice()
     {
+        var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForGreenPath(2, true);
         var blackPathTime = GenerateTimeForBlackPath(1, false);
-        var redPathTime1 = GenerateTimeForRedPath(2, false);
-
-        var time = Math.Min(blackPathTime, redPathTime1);
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-        if (time == redPathTime1)
-        {
-            var greenPathTime = GenerateTimeForGreenPath(2, true);
-            time += greenPathTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(greenPathTime));
-            return time;
-        }
-
-        var redPathTime2 = GenerateTimeForRedPath(3, false);
         var bluePathTime = GenerateTimeForBluePath(1, false);
+        var option2 = blackPathTime + GenerateTimeForRedPath(3, false) + bluePathTime;
+        var option3 = blackPathTime + GenerateTimeForBluePath(1, false) + GenerateTimeForRedPath(2, false) + bluePathTime;
 
-        var minTime = Math.Min(redPathTime2, bluePathTime);
-        time += minTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
-        if (minTime == bluePathTime)
-        {
-            var redPathTime3 = GenerateTimeForRedPath(2, false);
-            time += redPathTime3;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(redPathTime3));
-        }
-
-        var bluePathTime2 = GenerateTimeForBluePath(1, false);
-        time += bluePathTime2;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(bluePathTime2));
-
-        return time;
+        return GetBestOption(option1, option2, option3);
     }
 
     public double DivinkaToStrecno()
     {
-        var redPathTime = GenerateTimeForRedPath(2, false);
-        var time = redPathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-        var bluePathTime = GenerateTimeForBluePath(4, true);
-        time += bluePathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(bluePathTime));
-
-        return time;
+        var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForBluePath(4, true);
+        return GetBestOption(option1);
     }
 
     public double StrecnoToZilina()
     {
-        var blackPathTime = GenerateTimeForBlackPath(3, false);
-        var bluePathTime = GenerateTimeForGreenPath(4, false);
-        var redPathTime = GenerateTimeForRedPath(4, false);
-
-        var time = Math.Min(blackPathTime, Math.Min(redPathTime, bluePathTime));
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-
-        if (time == blackPathTime)
-        {
-            var nextGreenTime = GenerateTimeForGreenPath(4, false);
-            time += nextGreenTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextGreenTime));
-        }
-        else if (time == redPathTime)
-        {
-            var nextRedTime = GenerateTimeForRedPath(3, false);
-            time += nextRedTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
-        }
-        else
-        {
-            var nextBlackTime = GenerateTimeForBlackPath(2, true);
-            time += nextBlackTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
-        }
-
-        return time;
+        var option1 = GenerateTimeForRedPath(4, false) + GenerateTimeForRedPath(3, false);
+        var option2 = GenerateTimeForBlackPath(3, false) + GenerateTimeForGreenPath(4, false);
+        var option3 = GenerateTimeForBluePath(4, false) + GenerateTimeForBlackPath(2, true);
+        return GetBestOption(option1, option2, option3);
     }
 
     public double StrecnoToDivinka()
     {
-        var bluePathTime = GenerateTimeForBluePath(4, false);
-        var time = bluePathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-        var redPathTime = GenerateTimeForRedPath(2, true);
-        time += redPathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(redPathTime));
-
-        return time;
+        var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForRedPath(2, true);
+        return GetBestOption(option1);
     }
 
     public double StrecnoToRajeckeTeplice()
     {
-        var bluePathTime1 = GenerateTimeForBluePath(4, false);
-        var bluePathTime2 = GenerateTimeForBluePath(5, false);
-        var blackPathTime = GenerateTimeForBlackPath(4, false);
-
-        var time = Math.Min(bluePathTime1, Math.Min(bluePathTime2, blackPathTime));
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-
-        if (time == bluePathTime1)
-        {
-            var nextGreenTime = GenerateTimeForGreenPath(2, true);
-            time += nextGreenTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextGreenTime));
-        }
-        else
-        { 
-            var nextBlueTime = GenerateTimeForBluePath(8, true);
-            time += nextBlueTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
-        }
-
-        return time;
+        var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForGreenPath(2, true);
+        var bluePathTime = GenerateTimeForBluePath(8, false);
+        var option2 = GenerateTimeForBluePath(5, false) + bluePathTime;
+        var option3 = GenerateTimeForBlackPath(5, false) + bluePathTime;
+        return GetBestOption(option1, option2, option3);
     }
 
     public double RajeckeTepliceToDivinka()
     {
-        var greenPathTime = GenerateTimeForGreenPath(2, false);
+        var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForRedPath(2, true);
+        var blackPathTime = GenerateTimeForBlackPath(1, false);
         var bluePathTime = GenerateTimeForBluePath(1, false);
-        var time = Math.Min(greenPathTime, bluePathTime);
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-
-        if (time == greenPathTime)
-        {
-            var nextRedTime = GenerateTimeForRedPath(2, true);
-            time += nextRedTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextRedTime));
-            return time;
-        }
-
-        var redPathTime1 = GenerateTimeForRedPath(2, false);
-        var redPathTime2 = GenerateTimeForRedPath(3, false);
-        var minTime = Math.Min(redPathTime1, redPathTime2);
-        time += minTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
-        if (minTime == redPathTime1)
-        {
-            var nextBlueTime = GenerateTimeForBluePath(1, false);
-            time += nextBlueTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
-        }
-
-        var nextBlackTime = GenerateTimeForBlackPath(1, false);
-        time += nextBlackTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlackTime));
-
-        return time;
+        var option2 = bluePathTime + GenerateTimeForRedPath(3, false) + blackPathTime;
+        var option3 = bluePathTime + GenerateTimeForRedPath(2, false) + GenerateTimeForBluePath(1, false) + blackPathTime;
+        return GetBestOption(option1, option2, option3);
     }
 
     public double RajeckeTepliceToStrecno()
     {
-        var greenPathTime = GenerateTimeForGreenPath(2, false);
+        var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBluePath(4, true);
         var bluePathTime = GenerateTimeForBluePath(8, false);
-
-        var time = Math.Min(greenPathTime, bluePathTime);
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-
-        if (time == greenPathTime)
-        {
-            var nextBlueTime = GenerateTimeForBluePath(4, true);
-            time += nextBlueTime;
-            _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(nextBlueTime));
-            return time;
-        }
-
-        var nextBlueTime1 = GenerateTimeForBluePath(5, true);
-        var nextBlackTime = GenerateTimeForBlackPath(5, true);
-        var minTime = Math.Min(nextBlueTime1, nextBlackTime);
-        time += minTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
-
-        return time;
+        var option2 = bluePathTime + GenerateTimeForBluePath(5, false);
+        var option3 = bluePathTime + GenerateTimeForBlackPath(5, false);
+        return GetBestOption(option1, option2, option3);
     }
 
     public double RajeckeTepliceToZilina()
     {
-        var greenPathTime = GenerateTimeForGreenPath(2, false);
-        var time = greenPathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(time));
-        var blackPathTime = GenerateTimeForBlackPath(2, true);
-        time += blackPathTime;
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(blackPathTime));
-
-        return time;
+        var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBlackPath(2, true);
+        return GetBestOption(option1);
     }
 }

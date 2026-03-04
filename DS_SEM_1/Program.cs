@@ -7,12 +7,12 @@ public class Program
 {
     static void Main(string[] args)
     {
-        GeneratorsTester.DiscreteUniformTest();
-        GeneratorsTester.ContinuousUniformTest();
-        GeneratorsTester.DiscreteEmpiricTest();
-        GeneratorsTester.ContinuousEmpiricTest();
+        //GeneratorsTester.DiscreteUniformTest();
+        //GeneratorsTester.ContinuousUniformTest();
+        //GeneratorsTester.DiscreteEmpiricTest();
+        //GeneratorsTester.ContinuousEmpiricTest();
 
-        //TransporterAllRoutesMC tMC = new(10000000);
-        //tMC.RunAllRoutes();
+        TransporterAllRoutesMC tMC = new(10000000);
+        tMC.RunAllRoutes();
     }
 }
