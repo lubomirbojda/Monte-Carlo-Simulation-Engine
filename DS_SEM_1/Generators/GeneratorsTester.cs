@@ -7,7 +7,7 @@ namespace DS_SEM_1.Generators;
 
 public class GeneratorsTester
 {
-    private const int GENS_COUNT = 10000;
+    private const int GENS_COUNT = 1000000;
     public static void DiscreteEmpiricTest()
     {
         Random rand = new();
@@ -19,7 +19,7 @@ public class GeneratorsTester
             (75, 85, 0.05)
         ]);
 
-        TestGenerator("DiscreteEmpiricTest", generator.GenerateNext);
+        TestGenerator("DiscreteEmpiricTest.txt", generator.GenerateNext);
     }
 
     public static void ContinuousEmpiricTest()
@@ -30,21 +30,21 @@ public class GeneratorsTester
             (29, 45, 0.4),
             (45, 65, 0.4)
         ]);
-        TestGenerator("ContinuousEmpiricTest", generator.GenerateNext);
+        TestGenerator("ContinuousEmpiricTest.txt", generator.GenerateNext);
     }
 
     public static void DiscreteUniformTest()
     {
         Random rand = new();
         var generator = new DiscreteUniform(rand, 55, 75);
-        TestGenerator("DiscreteUniformTest", generator.GenerateNext);
+        TestGenerator("DiscreteUniformTest.txt", generator.GenerateNext);
     }
 
     public static void ContinuousUniformTest()
     {
         Random rand = new();
         var generator = new ContinuousUniform(rand, 50, 80);
-        TestGenerator("ContinuousUniformTest", generator.GenerateNext);
+        TestGenerator("ContinuousUniformTest.txt", generator.GenerateNext);
     }
 
     private static void TestGenerator<T> (string fileName, Func<T> generate) where T : INumber<T>
@@ -52,10 +52,12 @@ public class GeneratorsTester
         string currentDir = Environment.CurrentDirectory;
         string fullPath = Path.Combine(currentDir, fileName);
 
-        StreamWriter writer = new(fullPath);
-        for (int i = 0; i < GENS_COUNT; i++)
+        using (StreamWriter writer = new(fullPath))
         {
-            writer.WriteLine(generate());
+            for (int i = 0; i < GENS_COUNT; i++)
+            {
+                writer.WriteLine(generate());
+            }
         }
     }
 }

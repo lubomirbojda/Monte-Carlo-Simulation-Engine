@@ -1,11 +1,10 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 namespace DS_SEM_1.Generators.Empiric;
 
 public abstract class BaseInterval<T> where T : INumber<T>
 {
     protected T Min { get; }
-    protected T Max { get; }
     protected double Probability { get; }
     public double UpperBound { get; }
 
@@ -18,12 +17,11 @@ public abstract class BaseInterval<T> where T : INumber<T>
             throw new Exception("Minimum has to be higher or equal maximnum.");
 
         Min = min;
-        Max = max;
         Probability = probability;
         UpperBound = upperBound;
 
         _generator = new Random(seedForGenerator);
-        _generationRange = Max - Min;
+        _generationRange = max - Min;
     }
 
     public abstract T GenerateNext();
