@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="DS_SEM_1/DS_SEM_1.csproj" />
+  <Project Path="WinFormsApp1/GUI.csproj" Id="89d9d100-7441-4030-a313-74e885a5921c" />
 </Solution>

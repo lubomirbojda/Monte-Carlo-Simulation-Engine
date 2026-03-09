@@ -14,11 +14,16 @@ public class Map
 
     private ContinuousUniform _kSlowdownGenerator;
 
-    public TimeSpan _elapsedTime { get; private set; } = new(0, 0, 0);
-    private TimeSpan _limitK = new(0, 25, 0);
+    public TimeSpan ElapsedTime { get; private set; }
+    private TimeSpan _limitK;
 
-    public Map(Random seedGenerator)
+    public TimeSpan StartTime { get; private set; }
+
+    public void ResetElapsedTime() => ElapsedTime = new(0, 0, 0);
+
+    public Map(Random seedGenerator, TimeSpan startTime, TimeSpan kSlowdownTime)
     {
+        //ElapsedTime = new();
         _redPathGenerator = new(seedGenerator, 55, 75);
         _greenPathGenerator = new(seedGenerator, 50, 80);
         _blackPathGenerator = new(seedGenerator,
@@ -38,14 +43,14 @@ public class Map
         ]);
 
         _kSlowdownGenerator = new(seedGenerator, 10, 25);
+        StartTime = startTime;
+        _limitK = kSlowdownTime - startTime;
     }
-
-    public void ResetElapsedTime() => _elapsedTime = new(0, 0, 0);
 
     private double CalculateTime<T>(int length, T generatedSpeed, bool leavingFromK) where T : INumber<T>
     {
         double speed = double.CreateChecked(generatedSpeed);
-        if (leavingFromK && _elapsedTime > _limitK)
+        if (leavingFromK && ElapsedTime > _limitK)
             speed *= GenerateSlowdown();
 
         return length / speed;
@@ -68,44 +73,44 @@ public class Map
     private double GetBestOption(params double[] options)
     {
         var minTime = options.Min();
-        _elapsedTime = _elapsedTime.Add(TimeSpan.FromHours(minTime));
+        ElapsedTime = ElapsedTime.Add(TimeSpan.FromHours(minTime));
         return minTime;
     }
 
-    public double ZilinaToDivinka()
+    public void ZilinaToDivinka()
     {
         var option1 = GenerateTimeForGreenPath(4, false);
         var option2 = GenerateTimeForRedPath(4, false);
         var option3 = GenerateTimeForBlackPath(2, false) + GenerateTimeForRedPath(2, true);
 
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double ZilinaToStrecno()
+    public void ZilinaToStrecno()
     {
         var option1 = GenerateTimeForRedPath(3, false) + GenerateTimeForRedPath(4, false);
         var option2 = GenerateTimeForGreenPath(4, false) + GenerateTimeForBlackPath(3, false);
         var option3 = GenerateTimeForBlackPath(2, false) + GenerateTimeForBluePath(4, true);
 
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double ZilinaToRajeckeTeplice()
+    public void ZilinaToRajeckeTeplice()
     {
         var option1 = GenerateTimeForBlackPath(2, false) + GenerateTimeForGreenPath(2, true);
-        return GetBestOption(option1);
+        GetBestOption(option1);
     }
 
-    public double DivinkaToZilina()
+    public void DivinkaToZilina()
     {
         var option1 = GenerateTimeForGreenPath(4, false);
         var option2 = GenerateTimeForRedPath(4, false);
         var option3 = GenerateTimeForRedPath(2, false) + GenerateTimeForBlackPath(2, true);
 
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double DivinkaToRajeckeTeplice()
+    public void DivinkaToRajeckeTeplice()
     {
         var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForGreenPath(2, true);
         var blackPathTime = GenerateTimeForBlackPath(1, false);
@@ -113,60 +118,60 @@ public class Map
         var option2 = blackPathTime + GenerateTimeForRedPath(3, false) + bluePathTime;
         var option3 = blackPathTime + GenerateTimeForBluePath(1, false) + GenerateTimeForRedPath(2, false) + bluePathTime;
 
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double DivinkaToStrecno()
+    public void DivinkaToStrecno()
     {
         var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForBluePath(4, true);
-        return GetBestOption(option1);
+        GetBestOption(option1);
     }
 
-    public double StrecnoToZilina()
+    public void StrecnoToZilina()
     {
         var option1 = GenerateTimeForRedPath(4, false) + GenerateTimeForRedPath(3, false);
         var option2 = GenerateTimeForBlackPath(3, false) + GenerateTimeForGreenPath(4, false);
         var option3 = GenerateTimeForBluePath(4, false) + GenerateTimeForBlackPath(2, true);
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double StrecnoToDivinka()
+    public void StrecnoToDivinka()
     {
         var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForRedPath(2, true);
-        return GetBestOption(option1);
+        GetBestOption(option1);
     }
 
-    public double StrecnoToRajeckeTeplice()
+    public void StrecnoToRajeckeTeplice()
     {
         var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForGreenPath(2, true);
         var bluePathTime = GenerateTimeForBluePath(8, false);
         var option2 = GenerateTimeForBluePath(5, false) + bluePathTime;
         var option3 = GenerateTimeForBlackPath(5, false) + bluePathTime;
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double RajeckeTepliceToDivinka()
+    public void RajeckeTepliceToDivinka()
     {
         var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForRedPath(2, true);
         var blackPathTime = GenerateTimeForBlackPath(1, false);
         var bluePathTime = GenerateTimeForBluePath(1, false);
         var option2 = bluePathTime + GenerateTimeForRedPath(3, false) + blackPathTime;
         var option3 = bluePathTime + GenerateTimeForRedPath(2, false) + GenerateTimeForBluePath(1, false) + blackPathTime;
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double RajeckeTepliceToStrecno()
+    public void RajeckeTepliceToStrecno()
     {
         var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBluePath(4, true);
         var bluePathTime = GenerateTimeForBluePath(8, false);
         var option2 = bluePathTime + GenerateTimeForBluePath(5, false);
         var option3 = bluePathTime + GenerateTimeForBlackPath(5, false);
-        return GetBestOption(option1, option2, option3);
+        GetBestOption(option1, option2, option3);
     }
 
-    public double RajeckeTepliceToZilina()
+    public void RajeckeTepliceToZilina()
     {
         var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBlackPath(2, true);
-        return GetBestOption(option1);
+        GetBestOption(option1);
     }
 }

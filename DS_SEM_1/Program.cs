@@ -12,7 +12,7 @@ public class Program
         //GeneratorsTester.DiscreteEmpiricTest();
         //GeneratorsTester.ContinuousEmpiricTest();
 
-        TransporterAllRoutesMC tMC = new(10000000);
-        tMC.RunAllRoutes();
+        //TransporterAllRoutesMC tMC = new(10000000);
+        //tMC.RunAllRoutes();
     }
 }

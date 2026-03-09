@@ -1,76 +1,135 @@
-﻿namespace DS_SEM_1.MonteCarlo.TransporterMonteCarlo;
+using OpenTK.Graphics.ES11;
+using ScottPlot.WinForms;
+
+namespace DS_SEM_1.MonteCarlo.TransporterMonteCarlo;
 
 public class TransporterAllRoutesMC
 {
     private int _replCount;
     private int _seed;
+    private FormsPlot[] _plots;
+    private Label[] _labels;
+    private bool _isRunning = true;
+    private TransporterMC? _task;
 
-    public TransporterAllRoutesMC(int replicationCount, int? customSeed = null)
+    private TimeSpan _startTime;
+    private TimeSpan _kSlowdownTime;
+
+    public TransporterAllRoutesMC(int replicationCount, FormsPlot[] plots, Label[] targetLabels,
+        TimeSpan startTime, TimeSpan kSlowdownTime, int? customSeed = null)
     {
         _replCount = replicationCount;
+        _plots = plots;
         if (customSeed.HasValue)
             _seed = customSeed.Value;
         else
             _seed = new Random().Next();
+
+        _startTime = startTime;
+        _kSlowdownTime = kSlowdownTime;
+        _labels = targetLabels;
     }
 
-    public void RunAllRoutes()
+    public void StopSimulation()
+    {
+        _isRunning = false;
+        _task?.StopSimulation();
+    }
+
+    public void RunTask1()
     {
         //01------------------------------------------------------------------------------
-        Console.WriteLine("Route: Zilina -> Divinka -> Rajecke Teplice -> Strecno -> Zilina");
         RunRoute((transMC) => [
             transMC.Map.ZilinaToDivinka,
             transMC.Map.DivinkaToRajeckeTeplice,
             transMC.Map.RajeckeTepliceToStrecno,
             transMC.Map.StrecnoToZilina
-        ]);
+        ],
+        _plots[0],
+        "Route: ZA -> D -> RT -> S -> ZA",
+        _labels[0],
+        _startTime,
+        _kSlowdownTime);
         //02------------------------------------------------------------------------------
-        Console.WriteLine("Route: Zilina -> Divinka -> Strecno -> Rajecke Teplice -> Zilina");
         RunRoute((transMC) => [
             transMC.Map.ZilinaToDivinka,
             transMC.Map.DivinkaToStrecno,
             transMC.Map.StrecnoToRajeckeTeplice,
             transMC.Map.RajeckeTepliceToZilina
-        ]);
+        ],
+        _plots[1],
+        "Route: ZA -> D -> S -> RT -> ZA",
+        _labels[1],
+        _startTime,
+        _kSlowdownTime);
         //03------------------------------------------------------------------------------
-        Console.WriteLine("Route: Zilina -> Rajecke Teplice -> Divinka -> Strecno -> Zilina");
         RunRoute((transMC) => [
             transMC.Map.ZilinaToRajeckeTeplice,
             transMC.Map.RajeckeTepliceToDivinka,
             transMC.Map.DivinkaToStrecno,
             transMC.Map.StrecnoToZilina
-        ]);
+        ],
+        _plots[2],
+        "Route: ZA -> RT -> D -> S -> ZA",
+        _labels[2],
+        _startTime,
+        _kSlowdownTime);
         //04------------------------------------------------------------------------------
-        Console.WriteLine("Route: Zilina -> Rajecke Teplice -> Strecno -> Divinka -> Zilina");
         RunRoute((transMC) => [
             transMC.Map.ZilinaToRajeckeTeplice,
             transMC.Map.RajeckeTepliceToStrecno,
             transMC.Map.StrecnoToDivinka,
             transMC.Map.DivinkaToZilina
-        ]);
+        ],
+        _plots[3],
+        "Route: ZA -> RT -> S -> D -> ZA",
+        _labels[3],
+        _startTime,
+        _kSlowdownTime);
         //05------------------------------------------------------------------------------
-        Console.WriteLine("Route: Zilina -> Strecno -> Rajecke Teplice -> Divinka -> Zilina");
         RunRoute((transMC) => [
             transMC.Map.ZilinaToStrecno,
             transMC.Map.StrecnoToRajeckeTeplice,
             transMC.Map.RajeckeTepliceToDivinka,
             transMC.Map.DivinkaToZilina
-        ]);
+        ],
+        _plots[4],
+        "Route: ZA -> S -> RT -> D -> ZA",
+        _labels[4],
+        _startTime,
+        _kSlowdownTime);
         //06------------------------------------------------------------------------------
-        Console.WriteLine("Route: Zilina -> Strecno -> Divinka -> Rajecke Teplice -> Zilina");
         RunRoute((transMC) => [
             transMC.Map.ZilinaToStrecno,
             transMC.Map.StrecnoToDivinka,
             transMC.Map.DivinkaToRajeckeTeplice,
             transMC.Map.RajeckeTepliceToZilina
-        ]);
+        ],
+        _plots[5],
+        "Route: ZA -> S -> D -> RT -> ZA",
+        _labels[5],
+        _startTime,
+        _kSlowdownTime);
     }
 
-    private void RunRoute(Func<TransporterMC, List<Func<double>>> routeCreator)
+    public void RunTask2()
     {
-        TransporterMC transMC = new(_seed);
-        List<Func<double>> route = routeCreator(transMC);
-        transMC.SetNewRoute(route);
-        transMC.RunSimulation(_replCount);
+
+    }
+
+    private void RunRoute(Func<TransporterMC, List<Action>> routeCreator, FormsPlot plot, string plotName,
+        Label targetLabel, TimeSpan startTime, TimeSpan kSlowdowndTime)
+    {
+        TransporterMC transMC = new(_seed, startTime, kSlowdowndTime);
+        _task = transMC;
+        List<Action> route = routeCreator(_task);
+        _task.SetNewRoute(route);
+        if (!_isRunning)
+            _task.StopSimulation();
+        plot.Plot.Title(plotName);
+        _task.TargetLabelResult = targetLabel;
+        _task.TargetPlot = plot;
+
+        _task.RunSimulation(_replCount);
     }
 }
