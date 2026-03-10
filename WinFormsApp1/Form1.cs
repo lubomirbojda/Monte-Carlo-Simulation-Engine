@@ -6,8 +6,8 @@ namespace WinFormsApp1;
 public partial class Form1 : Form
 {
     private TabControl tabControl;
-    private TabPage tabUloha1;
-    private TabPage tabUloha2;
+    private TabPage tabTask1;
+    private TabPage tabTask2;
 
     private NumericUpDown nudStartH, nudStartM, nudStartS;
     private NumericUpDown nudKStartH, nudKStartM, nudKStartS;
@@ -23,6 +23,10 @@ public partial class Form1 : Form
     private FormsPlot plotU2;
     private Label lblResultU2;
 
+    private NumericUpDown nudU2_NewH, nudU2_NewM, nudU2_NewS;
+    private NumericUpDown nudReplU2_New;
+    private Label lblStatusU2_New;
+
     public Form1()
     {
         Text = "MonteCarlo";
@@ -35,11 +39,11 @@ public partial class Form1 : Form
     private void InitializeUI()
     {
         tabControl = new TabControl { Dock = DockStyle.Fill };
-        tabUloha1 = new TabPage("Úloha 1");
-        tabUloha2 = new TabPage("Úloha 2");
+        tabTask1 = new TabPage("Úloha 1");
+        tabTask2 = new TabPage("Úloha 2");
 
-        tabControl.TabPages.Add(tabUloha1);
-        tabControl.TabPages.Add(tabUloha2);
+        tabControl.TabPages.Add(tabTask1);
+        tabControl.TabPages.Add(tabTask2);
         Controls.Add(tabControl);
 
         SetupUloha1();
@@ -56,15 +60,15 @@ public partial class Form1 : Form
         };
         mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 130));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        tabUloha1.Controls.Add(mainLayout);
+        tabTask1.Controls.Add(mainLayout);
 
         FlowLayoutPanel inputPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, Padding = new Padding(10) };
         mainLayout.Controls.Add(inputPanel, 0, 0);
 
-        var startGroup = CreateTimeGroup("Čas začiatku", out nudStartH, out nudStartM, out nudStartS);
+        var startGroup = CreateTimeGroup("Čas začiatku", out nudStartH, out nudStartM, out nudStartS, 6, 0, 0);
         inputPanel.Controls.Add(startGroup);
 
-        var endGroup = CreateTimeGroup("Čas začiatku spomalenia", out nudKStartH, out nudKStartM, out nudKStartS);
+        var endGroup = CreateTimeGroup("Čas začiatku spomalenia", out nudKStartH, out nudKStartM, out nudKStartS, 6, 30, 0);
         inputPanel.Controls.Add(endGroup);
 
         GroupBox simGroup = new GroupBox { Text = "Nastavenia simulácie", Size = new Size(450, 100) };
@@ -75,7 +79,7 @@ public partial class Form1 : Form
             Location = new Point(85, 28),
             Width = 100,
             Maximum = decimal.MaxValue,
-            Value = 1000
+            Value = 100000
         };
 
         Label lblSeed = new Label { Text = "Seed:", Location = new Point(10, 60), AutoSize = true };
@@ -120,7 +124,6 @@ public partial class Form1 : Form
         simGroup.Controls.AddRange(new Control[] { lblRepl, nudReplications, lblSeed, nudSeed, cbUseSeed, btnStart, btnStop });
         inputPanel.Controls.Add(simGroup);
 
-        // --- GRAFY ---
         TableLayoutPanel chartGrid = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, ColumnCount = 3 };
         for (int i = 0; i < 3; i++) chartGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
         for (int i = 0; i < 2; i++) chartGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 50.00f));
@@ -148,13 +151,14 @@ public partial class Form1 : Form
         mainLayout.Controls.Add(chartGrid, 0, 1);
     }
 
-    private GroupBox CreateTimeGroup(string title, out NumericUpDown h, out NumericUpDown m, out NumericUpDown s)
+    private GroupBox CreateTimeGroup(string title, out NumericUpDown h, out NumericUpDown m, out NumericUpDown s,
+        int defaultH, int defaultM, int defaultS)
     {
         GroupBox gb = new GroupBox { Text = title, Size = new Size(220, 100) };
 
-        h = new NumericUpDown { Location = new Point(10, 45), Width = 50, Maximum = 23 };
-        m = new NumericUpDown { Location = new Point(75, 45), Width = 50, Maximum = 59 };
-        s = new NumericUpDown { Location = new Point(140, 45), Width = 50, Maximum = 59 };
+        h = new NumericUpDown { Location = new Point(10, 45), Width = 50, Maximum = 23, Value = defaultH };
+        m = new NumericUpDown { Location = new Point(75, 45), Width = 50, Maximum = 59, Value = defaultM };
+        s = new NumericUpDown { Location = new Point(140, 45), Width = 50, Maximum = 59, Value = defaultS };
 
         gb.Controls.Add(new Label { Text = "Hod:", Location = new Point(10, 25), AutoSize = true });
         gb.Controls.Add(new Label { Text = "Min:", Location = new Point(75, 25), AutoSize = true });
@@ -212,9 +216,9 @@ public partial class Form1 : Form
             RowCount = 2,
             ColumnCount = 1
         };
-        mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 100)); // Panel pre inputy
-        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));  // Graf
-        tabUloha2.Controls.Add(mainLayout);
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 100));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        tabTask2.Controls.Add(mainLayout);
 
         FlowLayoutPanel inputPanel = new FlowLayoutPanel
         {
@@ -232,7 +236,7 @@ public partial class Form1 : Form
             Location = new Point(85, 28),
             Width = 100,
             Maximum = decimal.MaxValue,
-            Value = 1000
+            Value = 100000
         };
 
         Button btnStart = new Button
@@ -257,6 +261,24 @@ public partial class Form1 : Form
 
         simGroup.Controls.AddRange(new Control[] { lblRepl, nudReplU2, btnStart, btnStop });
         inputPanel.Controls.Add(simGroup);
+
+        GroupBox extraGroup = new GroupBox { Text = "Simulácia pre % jázd do 7:35", Size = new Size(580, 85) };
+
+        Label lblTime = new Label { Text = "Čas:", Location = new Point(10, 25), AutoSize = true };
+        nudU2_NewH = new NumericUpDown { Location = new Point(45, 23), Width = 40, Maximum = 23, Value = 7 };
+        nudU2_NewM = new NumericUpDown { Location = new Point(90, 23), Width = 40, Maximum = 59, Value = 0 };
+        nudU2_NewS = new NumericUpDown { Location = new Point(135, 23), Width = 40, Maximum = 59, Value = 0 };
+
+        Label lblReplNew = new Label { Text = "Repl.:", Location = new Point(185, 25), AutoSize = true };
+        nudReplU2_New = new NumericUpDown { Location = new Point(225, 23), Width = 80, Maximum = decimal.MaxValue, Value = 100000 };
+
+        Button btnStartNew = new Button { Text = "SPUSTIŤ", Location = new Point(315, 20), Size = new Size(130, 30), BackColor = Color.LightBlue, Font = new Font(DefaultFont, FontStyle.Bold) };
+        btnStartNew.Click += BtnStartU2New_Click;
+
+        lblStatusU2_New = new Label { Text = "Status: -", Location = new Point(10, 55), Width = 550, Font = new Font("Segoe UI", 9, FontStyle.Italic)};
+
+        extraGroup.Controls.AddRange(new Control[] { lblTime, nudU2_NewH, nudU2_NewM, nudU2_NewS, lblReplNew, nudReplU2_New, btnStartNew, lblStatusU2_New });
+        inputPanel.Controls.Add(extraGroup);
 
         Panel pnlChart = new Panel { Dock = DockStyle.Fill, Padding = new Padding(10) };
 
@@ -291,6 +313,21 @@ public partial class Form1 : Form
 
     private async void BtnStopU2_Click(object sender, EventArgs e)
     {
+        _task?.StopSimulation();
+    }
 
+    private async void BtnStartU2New_Click(object sender, EventArgs e)
+    {
+        lblStatusU2_New.Text = "Simulácia beží...";
+
+        int h = (int)nudU2_NewH.Value;
+        int m = (int)nudU2_NewM.Value;
+        int s = (int)nudU2_NewS.Value;
+        int replikacie = (int)nudReplU2_New.Value;
+
+        TimeSpan startTime = new TimeSpan(h, m, s);
+
+        _task = new TransporterAllRoutesMC(replikacie, plots, plotResults, startTime, new());
+        await Task.Run(() => _task.RunTask2Percentil(startTime, lblStatusU2_New));
     }
 }

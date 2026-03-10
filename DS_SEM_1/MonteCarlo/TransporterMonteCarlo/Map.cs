@@ -23,7 +23,6 @@ public class Map
 
     public Map(Random seedGenerator, TimeSpan startTime, TimeSpan kSlowdownTime)
     {
-        //ElapsedTime = new();
         _redPathGenerator = new(seedGenerator, 55, 75);
         _greenPathGenerator = new(seedGenerator, 50, 80);
         _blackPathGenerator = new(seedGenerator,

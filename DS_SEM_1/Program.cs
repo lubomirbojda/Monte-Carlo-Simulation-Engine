@@ -11,8 +11,5 @@ public class Program
         //GeneratorsTester.ContinuousUniformTest();
         //GeneratorsTester.DiscreteEmpiricTest();
         //GeneratorsTester.ContinuousEmpiricTest();
-
-        //TransporterAllRoutesMC tMC = new(10000000);
-        //tMC.RunAllRoutes();
     }
 }

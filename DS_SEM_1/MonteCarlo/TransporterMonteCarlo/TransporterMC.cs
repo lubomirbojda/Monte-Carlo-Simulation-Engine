@@ -72,13 +72,6 @@ public class TransporterMC : BaseMonteCarlo
             TargetLabelResult.Text = $"Priemerný čas: " + avg.ToString();
             TargetLabelResult.Refresh();
         }));
-
-        //_replictaionsResults.Sort();
-        //var th80 = (int)(_replictaionsResults.Count * 0.8);
-        //var result80 = _replictaionsResults[th80];
-        //TimeSpan end = new(7, 35, 0);
-        //TimeSpan result80Time = end.Subtract(TimeSpan.FromMinutes(result80));
-        //Console.WriteLine("Leave time if 80 at 7:35:  " + result80Time);
     }
 
     private void UpdateGraph()

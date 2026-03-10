@@ -46,7 +46,7 @@ public class TransporterAllRoutesMC
             transMC.Map.StrecnoToZilina
         ],
         _plots[0],
-        "Route: ZA -> D -> RT -> S -> ZA",
+        "Trasa: ZA -> D -> RT -> S -> ZA",
         _labels[0],
         _startTime,
         _kSlowdownTime);
@@ -58,7 +58,7 @@ public class TransporterAllRoutesMC
             transMC.Map.RajeckeTepliceToZilina
         ],
         _plots[1],
-        "Route: ZA -> D -> S -> RT -> ZA",
+        "Trasa: ZA -> D -> S -> RT -> ZA",
         _labels[1],
         _startTime,
         _kSlowdownTime);
@@ -70,7 +70,7 @@ public class TransporterAllRoutesMC
             transMC.Map.StrecnoToZilina
         ],
         _plots[2],
-        "Route: ZA -> RT -> D -> S -> ZA",
+        "Trasa: ZA -> RT -> D -> S -> ZA",
         _labels[2],
         _startTime,
         _kSlowdownTime);
@@ -82,7 +82,7 @@ public class TransporterAllRoutesMC
             transMC.Map.DivinkaToZilina
         ],
         _plots[3],
-        "Route: ZA -> RT -> S -> D -> ZA",
+        "Trasa: ZA -> RT -> S -> D -> ZA",
         _labels[3],
         _startTime,
         _kSlowdownTime);
@@ -94,7 +94,7 @@ public class TransporterAllRoutesMC
             transMC.Map.DivinkaToZilina
         ],
         _plots[4],
-        "Route: ZA -> S -> RT -> D -> ZA",
+        "Trasa: ZA -> S -> RT -> D -> ZA",
         _labels[4],
         _startTime,
         _kSlowdownTime);
@@ -106,7 +106,7 @@ public class TransporterAllRoutesMC
             transMC.Map.RajeckeTepliceToZilina
         ],
         _plots[5],
-        "Route: ZA -> S -> D -> RT -> ZA",
+        "Trasa: ZA -> S -> D -> RT -> ZA",
         _labels[5],
         _startTime,
         _kSlowdownTime);
@@ -133,17 +133,34 @@ public class TransporterAllRoutesMC
         TransporteMCTask2 transMCT2 = new(_seed, new(7, 0, 0), new(6, 30, 0));
         _task = transMCT2;
         List<Action> route = [
-            transMCT2.Map.ZilinaToDivinka,
-            transMCT2.Map.DivinkaToRajeckeTeplice,
-            transMCT2.Map.RajeckeTepliceToStrecno,
-            transMCT2.Map.StrecnoToZilina
+            transMCT2.Map.ZilinaToStrecno,
+            transMCT2.Map.StrecnoToRajeckeTeplice,
+            transMCT2.Map.RajeckeTepliceToDivinka,
+            transMCT2.Map.DivinkaToZilina
             ];
         _task.SetNewRoute(route);
         if (!_isRunning)
             _task.StopSimulation();
-        plot.Plot.Title("Route: ZA -> D -> RT -> S -> ZA");
+        plot.Plot.Title("Trasa: ZA -> S -> RT -> D -> ZA");
         _task.TargetLabelResult = targetLabel;
         _task.TargetPlot = plot;
+        _task.RunSimulation(_replCount);
+    }
+
+    public void RunTask2Percentil(TimeSpan startTime, Label targetLabel)
+    {
+        TransporteMCTask2Percentil transMCT2Perc = new(_seed, startTime, new(6, 30, 0));
+        _task = transMCT2Perc;
+        List<Action> route = [
+            transMCT2Perc.Map.ZilinaToStrecno,
+            transMCT2Perc.Map.StrecnoToRajeckeTeplice,
+            transMCT2Perc.Map.RajeckeTepliceToDivinka,
+            transMCT2Perc.Map.DivinkaToZilina
+        ];
+        _task.SetNewRoute(route);
+        if (!_isRunning)
+            _task.StopSimulation();
+        _task.TargetLabelResult = targetLabel;
         _task.RunSimulation(_replCount);
     }
 }
