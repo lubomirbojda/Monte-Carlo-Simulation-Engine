@@ -112,11 +112,6 @@ public class TransporterAllRoutesMC
         _kSlowdownTime);
     }
 
-    public void RunTask2()
-    {
-
-    }
-
     private void RunRoute(Func<TransporterMC, List<Action>> routeCreator, FormsPlot plot, string plotName,
         Label targetLabel, TimeSpan startTime, TimeSpan kSlowdowndTime)
     {
@@ -130,6 +125,25 @@ public class TransporterAllRoutesMC
         _task.TargetLabelResult = targetLabel;
         _task.TargetPlot = plot;
 
+        _task.RunSimulation(_replCount);
+    }
+
+    public void RunTask2(FormsPlot plot, Label targetLabel)
+    {
+        TransporteMCTask2 transMCT2 = new(_seed, new(7, 0, 0), new(6, 30, 0));
+        _task = transMCT2;
+        List<Action> route = [
+            transMCT2.Map.ZilinaToDivinka,
+            transMCT2.Map.DivinkaToRajeckeTeplice,
+            transMCT2.Map.RajeckeTepliceToStrecno,
+            transMCT2.Map.StrecnoToZilina
+            ];
+        _task.SetNewRoute(route);
+        if (!_isRunning)
+            _task.StopSimulation();
+        plot.Plot.Title("Route: ZA -> D -> RT -> S -> ZA");
+        _task.TargetLabelResult = targetLabel;
+        _task.TargetPlot = plot;
         _task.RunSimulation(_replCount);
     }
 }

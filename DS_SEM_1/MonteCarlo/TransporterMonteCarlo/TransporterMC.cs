@@ -5,7 +5,7 @@ namespace DS_SEM_1.MonteCarlo.TransporterMonteCarlo;
 public class TransporterMC : BaseMonteCarlo
 {
     public Map Map {  get; private set; }
-    private double _totalTime;
+    protected double _totalTime;
     private List<Action> _route = [];
     public List<double> _replictaionsResults { get; private set; } = [];
 
@@ -27,7 +27,7 @@ public class TransporterMC : BaseMonteCarlo
 
     protected override void BeforeSimulation()
     {
-        _replictaionsResults = new(_replicationsCount);
+        _replictaionsResults = [];
         _totalTime = 0;
         _warmUp = (int)(_replicationsCount * 0.2);
     }

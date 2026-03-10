@@ -12,11 +12,16 @@ public partial class Form1 : Form
     private NumericUpDown nudStartH, nudStartM, nudStartS;
     private NumericUpDown nudKStartH, nudKStartM, nudKStartS;
     private NumericUpDown nudReplications, nudSeed;
+    private CheckBox cbUseSeed;
 
-    private TransporterAllRoutesMC _task1;
+    private TransporterAllRoutesMC _task;
 
     private FormsPlot[] plots = new FormsPlot[6];
     private Label[] plotResults = new Label[6];
+
+    private NumericUpDown nudReplU2;
+    private FormsPlot plotU2;
+    private Label lblResultU2;
 
     public Form1()
     {
@@ -38,6 +43,7 @@ public partial class Form1 : Form
         Controls.Add(tabControl);
 
         SetupUloha1();
+        SetupUloha2();
     }
 
     private void SetupUloha1()
@@ -61,7 +67,7 @@ public partial class Form1 : Form
         var endGroup = CreateTimeGroup("Čas začiatku spomalenia", out nudKStartH, out nudKStartM, out nudKStartS);
         inputPanel.Controls.Add(endGroup);
 
-        GroupBox simGroup = new GroupBox { Text = "Nastavenia simulácie", Size = new Size(420, 100) };
+        GroupBox simGroup = new GroupBox { Text = "Nastavenia simulácie", Size = new Size(450, 100) };
 
         Label lblRepl = new Label { Text = "Replikácie:", Location = new Point(10, 30), AutoSize = true };
         nudReplications = new NumericUpDown
@@ -78,14 +84,24 @@ public partial class Form1 : Form
             Location = new Point(85, 58),
             Width = 100,
             Maximum = decimal.MaxValue,
-            Value = 12345
+            Value = 12345,
+            Enabled = false
         };
+
+        cbUseSeed = new CheckBox
+        {
+            Text = "Použiť vlastný Seed",
+            Location = new Point(190, 58),
+            AutoSize = true
+        };
+
+        cbUseSeed.CheckedChanged += (s, e) => { nudSeed.Enabled = cbUseSeed.Checked; };
 
         Button btnStart = new Button
         {
             Text = "SPUSTIŤ",
-            Location = new Point(210, 25),
-            Size = new Size(90, 55),
+            Location = new Point(230, 20),
+            Size = new Size(95, 30),
             BackColor = Color.LightGreen,
             Font = new Font(DefaultFont, FontStyle.Bold)
         };
@@ -94,16 +110,17 @@ public partial class Form1 : Form
         Button btnStop = new Button
         {
             Text = "ZASTAVIŤ",
-            Location = new Point(310, 25),
-            Size = new Size(90, 55),
+            Location = new Point(335, 20),
+            Size = new Size(95, 30),
             BackColor = Color.LightCoral,
             Font = new Font(DefaultFont, FontStyle.Bold)
         };
         btnStop.Click += BtnStop_Click;
 
-        simGroup.Controls.AddRange(new Control[] { lblRepl, nudReplications, lblSeed, nudSeed, btnStart, btnStop });
+        simGroup.Controls.AddRange(new Control[] { lblRepl, nudReplications, lblSeed, nudSeed, cbUseSeed, btnStart, btnStop });
         inputPanel.Controls.Add(simGroup);
 
+        // --- GRAFY ---
         TableLayoutPanel chartGrid = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, ColumnCount = 3 };
         for (int i = 0; i < 3; i++) chartGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
         for (int i = 0; i < 2; i++) chartGrid.RowStyles.Add(new RowStyle(SizeType.Percent, 50.00f));
@@ -129,8 +146,6 @@ public partial class Form1 : Form
             chartGrid.Controls.Add(pnlChart, i % 3, i / 3);
         }
         mainLayout.Controls.Add(chartGrid, 0, 1);
-
-
     }
 
     private GroupBox CreateTimeGroup(string title, out NumericUpDown h, out NumericUpDown m, out NumericUpDown s)
@@ -162,8 +177,7 @@ public partial class Form1 : Form
         TimeSpan start = new(startH, startM, startS);
         TimeSpan kStart = new(kStartH, kStartM, kStartS);
 
-        int replikacie = (int)nudReplications.Value;
-        int seed = (int)nudSeed.Value;
+        int replikacie = (int)nudReplications.Value;     
 
         foreach (var plot in plots)
         {
@@ -171,14 +185,112 @@ public partial class Form1 : Form
             plot.Refresh();
         }
 
+        if (cbUseSeed.Checked)
+        {
+            int seed = (int)nudSeed.Value;
+            _task = new TransporterAllRoutesMC(replikacie, plots, plotResults, start, kStart, seed);
+        }
+        else
+        {
+            _task = new TransporterAllRoutesMC(replikacie, plots, plotResults, start, kStart);
+        }
+        
 
-        _task1 = new TransporterAllRoutesMC(replikacie, plots, plotResults, start, kStart);
-
-        await Task.Run(() => _task1.RunTask1());
+        await Task.Run(() => _task.RunTask1());
     }
 
     private void BtnStop_Click(object sender, EventArgs e)
     {
-        _task1.StopSimulation();
+        _task?.StopSimulation();
+    }
+
+    private void SetupUloha2()
+    {
+        TableLayoutPanel mainLayout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            RowCount = 2,
+            ColumnCount = 1
+        };
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 100)); // Panel pre inputy
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));  // Graf
+        tabUloha2.Controls.Add(mainLayout);
+
+        FlowLayoutPanel inputPanel = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.LeftToRight,
+            Padding = new Padding(10)
+        };
+        mainLayout.Controls.Add(inputPanel, 0, 0);
+
+        GroupBox simGroup = new GroupBox { Text = "Nastavenia simulácie (Úloha 2)", Size = new Size(450, 70) };
+
+        Label lblRepl = new Label { Text = "Replikácie:", Location = new Point(10, 30), AutoSize = true };
+        nudReplU2 = new NumericUpDown
+        {
+            Location = new Point(85, 28),
+            Width = 100,
+            Maximum = decimal.MaxValue,
+            Value = 1000
+        };
+
+        Button btnStart = new Button
+        {
+            Text = "SPUSTIŤ",
+            Location = new Point(210, 22),
+            Size = new Size(100, 35),
+            BackColor = Color.LightGreen,
+            Font = new Font(DefaultFont, FontStyle.Bold)
+        };
+        btnStart.Click += BtnStartU2_Click;
+
+        Button btnStop = new Button
+        {
+            Text = "ZASTAVIŤ",
+            Location = new Point(320, 22),
+            Size = new Size(100, 35),
+            BackColor = Color.LightCoral,
+            Font = new Font(DefaultFont, FontStyle.Bold)
+        };
+        btnStop.Click += BtnStopU2_Click;
+
+        simGroup.Controls.AddRange(new Control[] { lblRepl, nudReplU2, btnStart, btnStop });
+        inputPanel.Controls.Add(simGroup);
+
+        Panel pnlChart = new Panel { Dock = DockStyle.Fill, Padding = new Padding(10) };
+
+        lblResultU2 = new Label
+        {
+            Text = "Výsledok: ",
+            Dock = DockStyle.Bottom,
+            Height = 30,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Font = new Font("Segoe UI", 10, FontStyle.Bold),
+            ForeColor = Color.DarkBlue
+        };
+
+        plotU2 = new FormsPlot { Dock = DockStyle.Fill };
+
+        pnlChart.Controls.Add(plotU2);
+        pnlChart.Controls.Add(lblResultU2);
+        mainLayout.Controls.Add(pnlChart, 0, 1);
+    }
+
+    private async void BtnStartU2_Click(object sender, EventArgs e)
+    {
+        int replikacie = (int)nudReplU2.Value;
+
+        plotU2.Plot.Clear();
+        plotU2.Refresh();
+
+
+        _task = new TransporterAllRoutesMC(replikacie, plots, plotResults, new(7, 0, 0), new(6, 30, 0));
+        await Task.Run(() => _task.RunTask2(plotU2, lblResultU2));
+    }
+
+    private async void BtnStopU2_Click(object sender, EventArgs e)
+    {
+
     }
 }
