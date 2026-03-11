@@ -27,6 +27,7 @@ public partial class Form1 : Form
     private NumericUpDown nudReplU2_New;
     private Label lblStatusU2_New;
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     public Form1()
     {
         Text = "MonteCarlo";
@@ -36,6 +37,7 @@ public partial class Form1 : Form
         InitializeUI();
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private void InitializeUI()
     {
         tabControl = new TabControl { Dock = DockStyle.Fill };
@@ -50,6 +52,7 @@ public partial class Form1 : Form
         SetupUloha2();
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private void SetupUloha1()
     {
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -151,6 +154,7 @@ public partial class Form1 : Form
         mainLayout.Controls.Add(chartGrid, 0, 1);
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private GroupBox CreateTimeGroup(string title, out NumericUpDown h, out NumericUpDown m, out NumericUpDown s,
         int defaultH, int defaultM, int defaultS)
     {
@@ -168,6 +172,7 @@ public partial class Form1 : Form
         return gb;
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private async void BtnStart_Click(object sender, EventArgs e)
     {
         int startH = (int)nudStartH.Value;
@@ -203,11 +208,13 @@ public partial class Form1 : Form
         await Task.Run(() => _task.RunTask1());
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private void BtnStop_Click(object sender, EventArgs e)
     {
         _task?.StopSimulation();
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private void SetupUloha2()
     {
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -299,6 +306,7 @@ public partial class Form1 : Form
         mainLayout.Controls.Add(pnlChart, 0, 1);
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private async void BtnStartU2_Click(object sender, EventArgs e)
     {
         int replikacie = (int)nudReplU2.Value;
@@ -311,11 +319,13 @@ public partial class Form1 : Form
         await Task.Run(() => _task.RunTask2(plotU2, lblResultU2));
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private async void BtnStopU2_Click(object sender, EventArgs e)
     {
         _task?.StopSimulation();
     }
 
+    //metóda vytvorená pomocou AI - zdokumentované v kapitole 2
     private async void BtnStartU2New_Click(object sender, EventArgs e)
     {
         lblStatusU2_New.Text = "Simulácia beží...";
