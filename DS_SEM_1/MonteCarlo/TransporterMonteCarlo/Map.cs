@@ -50,7 +50,24 @@ public class Map
     {
         double speed = double.CreateChecked(generatedSpeed);
         if (leavingFromK && ElapsedTime > _limitK)
-            speed *= GenerateSlowdown();
+        {
+            var slowdown = GenerateSlowdown();
+            speed *= slowdown;
+        }
+
+
+        return length / speed;
+    }
+
+    private double CalculateTimeAtElapsed<T>(int length, T generatedSpeed, bool leavingFromK, TimeSpan currElapsed) where T : INumber<T>
+    {
+        double speed = double.CreateChecked(generatedSpeed);
+        if (leavingFromK && currElapsed > _limitK)
+        {
+            var slowdown = GenerateSlowdown();
+            speed *= slowdown;
+        }
+
 
         return length / speed;
     }
@@ -80,7 +97,10 @@ public class Map
     {
         var option1 = GenerateTimeForGreenPath(4, false);
         var option2 = GenerateTimeForRedPath(4, false);
-        var option3 = GenerateTimeForBlackPath(2, false) + GenerateTimeForRedPath(2, true);
+        var toK = GenerateTimeForBlackPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _redPathGenerator.GenerateNext(), true, curEl);
+        var option3 = toK + fromK;
 
         GetBestOption(option1, option2, option3);
     }
@@ -89,14 +109,25 @@ public class Map
     {
         var option1 = GenerateTimeForRedPath(3, false) + GenerateTimeForRedPath(4, false);
         var option2 = GenerateTimeForGreenPath(4, false) + GenerateTimeForBlackPath(3, false);
-        var option3 = GenerateTimeForBlackPath(2, false) + GenerateTimeForBluePath(4, true);
+        //var option3 = GenerateTimeForBlackPath(2, false) + GenerateTimeForBluePath(4, true);
+
+        var toK = GenerateTimeForBlackPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(4, _bluePathGenerator.GenerateNext(), true, curEl);
+        var option3 = toK + fromK;
 
         GetBestOption(option1, option2, option3);
     }
 
     public void ZilinaToRajeckeTeplice()
     {
-        var option1 = GenerateTimeForBlackPath(2, false) + GenerateTimeForGreenPath(2, true);
+        //var option1 = GenerateTimeForBlackPath(2, false) + GenerateTimeForGreenPath(2, true);
+
+        var toK = GenerateTimeForBlackPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _greenPathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
+
         GetBestOption(option1);
     }
 
@@ -104,25 +135,41 @@ public class Map
     {
         var option1 = GenerateTimeForGreenPath(4, false);
         var option2 = GenerateTimeForRedPath(4, false);
-        var option3 = GenerateTimeForRedPath(2, false) + GenerateTimeForBlackPath(2, true);
+        //var option3 = GenerateTimeForRedPath(2, false) + GenerateTimeForBlackPath(2, true);
+
+        var toK = GenerateTimeForRedPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _blackPathGenerator.GenerateNext(), true, curEl);
+        var option3 = toK + fromK;
 
         GetBestOption(option1, option2, option3);
     }
 
     public void DivinkaToRajeckeTeplice()
     {
-        var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForGreenPath(2, true);
+        //var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForGreenPath(2, true);
         var blackPathTime = GenerateTimeForBlackPath(1, false);
         var bluePathTime = GenerateTimeForBluePath(1, false);
         var option2 = blackPathTime + GenerateTimeForRedPath(3, false) + bluePathTime;
         var option3 = blackPathTime + GenerateTimeForBluePath(1, false) + GenerateTimeForRedPath(2, false) + bluePathTime;
+
+        var toK = GenerateTimeForRedPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _greenPathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
 
         GetBestOption(option1, option2, option3);
     }
 
     public void DivinkaToStrecno()
     {
-        var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForBluePath(4, true);
+        //var option1 = GenerateTimeForRedPath(2, false) + GenerateTimeForBluePath(4, true);
+
+        var toK = GenerateTimeForRedPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(4, _bluePathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
+
         GetBestOption(option1);
     }
 
@@ -130,47 +177,84 @@ public class Map
     {
         var option1 = GenerateTimeForRedPath(4, false) + GenerateTimeForRedPath(3, false);
         var option2 = GenerateTimeForBlackPath(3, false) + GenerateTimeForGreenPath(4, false);
-        var option3 = GenerateTimeForBluePath(4, false) + GenerateTimeForBlackPath(2, true);
+        //var option3 = GenerateTimeForBluePath(4, false) + GenerateTimeForBlackPath(2, true);
+
+        var toK = GenerateTimeForBluePath(4, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _blackPathGenerator.GenerateNext(), true, curEl);
+        var option3 = toK + fromK;
+
         GetBestOption(option1, option2, option3);
     }
 
     public void StrecnoToDivinka()
     {
-        var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForRedPath(2, true);
+        //var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForRedPath(2, true);
+
+        var toK = GenerateTimeForBluePath(4, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _redPathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
+
         GetBestOption(option1);
     }
 
     public void StrecnoToRajeckeTeplice()
     {
-        var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForGreenPath(2, true);
+        //var option1 = GenerateTimeForBluePath(4, false) + GenerateTimeForGreenPath(2, true);
         var bluePathTime = GenerateTimeForBluePath(8, false);
         var option2 = GenerateTimeForBluePath(5, false) + bluePathTime;
         var option3 = GenerateTimeForBlackPath(5, false) + bluePathTime;
+
+        var toK = GenerateTimeForBluePath(4, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _greenPathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
+
         GetBestOption(option1, option2, option3);
     }
 
     public void RajeckeTepliceToDivinka()
     {
-        var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForRedPath(2, true);
+        //var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForRedPath(2, true);
         var blackPathTime = GenerateTimeForBlackPath(1, false);
         var bluePathTime = GenerateTimeForBluePath(1, false);
         var option2 = bluePathTime + GenerateTimeForRedPath(3, false) + blackPathTime;
         var option3 = bluePathTime + GenerateTimeForRedPath(2, false) + GenerateTimeForBluePath(1, false) + blackPathTime;
+
+        var toK = GenerateTimeForGreenPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _redPathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
+
+
         GetBestOption(option1, option2, option3);
     }
 
     public void RajeckeTepliceToStrecno()
     {
-        var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBluePath(4, true);
+        //var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBluePath(4, true);
         var bluePathTime = GenerateTimeForBluePath(8, false);
         var option2 = bluePathTime + GenerateTimeForBluePath(5, false);
         var option3 = bluePathTime + GenerateTimeForBlackPath(5, false);
+
+        var toK = GenerateTimeForGreenPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(4, _bluePathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
+
         GetBestOption(option1, option2, option3);
     }
 
     public void RajeckeTepliceToZilina()
     {
-        var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBlackPath(2, true);
+        //var option1 = GenerateTimeForGreenPath(2, false) + GenerateTimeForBlackPath(2, true);
+
+        var toK = GenerateTimeForGreenPath(2, false);
+        var curEl = ElapsedTime.Add(TimeSpan.FromHours(toK));
+        var fromK = CalculateTimeAtElapsed(2, _blackPathGenerator.GenerateNext(), true, curEl);
+        var option1 = toK + fromK;
+
         GetBestOption(option1);
     }
 }
