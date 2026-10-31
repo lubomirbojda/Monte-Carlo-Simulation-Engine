@@ -239,6 +239,8 @@ Complete technical documentation (in Slovak) is included in the repository root:
   - Experimental results, convergence plots (`10,000,000` replications), and verification analysis for Task 1 and Task 2
   - Complete UML Class Diagrams of the generator hierarchy and Monte Carlo simulation classes
 
+> **Note:** PDF documentation is written in the **Slovak language**.
+
 ---
 
 ## Screenshots
